@@ -1,8 +1,8 @@
 use std::env::{var, VarError};
 
 pub struct Env {
-  pub pg_info: String,
-  pub discord_token: String
+  pub discord_token: String,
+  pub pg_info: String
 }
 
 impl Env {
@@ -10,7 +10,7 @@ impl Env {
     Ok(Env {
       pg_info: format!(
         "host=localhost user={} password={} dbname={}",
-        var("PG_USER")?,
+        var("PG_USERNAME")?,
         var("PG_PASSWORD")?,
         var("PG_DATABASE")?
       ),
