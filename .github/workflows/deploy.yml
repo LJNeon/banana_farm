@@ -7,6 +7,9 @@ on:
     branches: master
     types: completed
 
+# Prevent multiple deployments from running at once.
+concurrency: deployment
+
 jobs:
   deploy:
     name: Deploy
@@ -39,6 +42,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           source: target/${{ secrets.TARGET }}/release/banana_farm
           target: ${{ secrets.PATH }}
+          strip_components: 1
 #      - name: Deploy project
 #        uses: appleboy/ssh-action@master
 #        with:
