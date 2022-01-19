@@ -1,6 +1,6 @@
 name: "Deploy"
 
-# Trigger after lint workflow finishes on master branch.
+# Wait for lint workflow to finish, and only deploy from master branch.
 on:
   workflow_run:
     workflows: Lint
@@ -46,4 +46,4 @@ jobs:
 #          key: ${{ secrets.KEY }}
 #          port: ${{ secrets.PORT }}
 #          username: ${{ secrets.USERNAME }}
-#          script: TODO
+#          script: sudo systemctl restart banana_farm
