@@ -1,0 +1,48 @@
+name: "Deploy"
+
+# Trigger after lint workflow finishes on master branch.
+on:
+  workflow_run:
+    workflows: Lint
+    branches: master
+    types: completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only deploy if lint passed and this isn't a pull request.
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ secrets.TARGET }}
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v1
+      - name: Build project
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target ${{ secrets.TARGET }}
+      - name: Upload project
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.USERNAME }}
+          source: target/${{ secrets.TARGET }}/release/banana_farm
+          target: ${{ secrets.PATH }}
+#      - name: Deploy project
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.HOST }}
+#          key: ${{ secrets.KEY }}
+#          port: ${{ secrets.PORT }}
+#          username: ${{ secrets.USERNAME }}
+#          script: TODO

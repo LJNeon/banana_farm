@@ -1,0 +1,27 @@
+[package]
+name = 'banana_farm'
+description = 'An entertainment Discord bot based on Bloons TD 6.'
+authors = ['LJ Talbot <eljayt@protonmail.com>']
+version = '0.1.0'
+edition = '2021'
+license = 'AGPL-3.0-or-later'
+publish = false
+
+[dependencies]
+tracing = '0.1'
+tracing-subscriber = '0.3'
+futures = '0.3'
+tokio = {version = '1.15', default-features = false, features = ['rt-multi-thread', 'macros']}
+tokio-postgres = '0.7'
+twilight-model = '0.8'
+twilight-cache-inmemory = {version = '0.8', features = ['permission-calculator']}
+twilight-gateway = {version = '0.8', default-features = false, features = ['rustls', 'simd-json', 'zlib-simd']}
+twilight-http = {version = '0.8', default-features = false, features = ['rustls', 'simd-json']}
+
+[profile.dev]
+incremental = true
+
+[profile.release]
+codegen-units = 1
+lto = 'thin'
+panic = 'abort'
