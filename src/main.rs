@@ -4,7 +4,7 @@ use tracing::info;
 
 pub mod utility;
 
-use utility::{Env, start_tracing};
+use utility::{start_tracing, Env};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
