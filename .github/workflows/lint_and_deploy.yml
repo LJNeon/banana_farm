@@ -1,4 +1,4 @@
-name: Lint & Deploy
+name: Lint&Deploy
 
 on: [push, pull_request]
 
