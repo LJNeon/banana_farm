@@ -1,0 +1,93 @@
+name: Lint&Deploy
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v1
+      - run: cargo check --all-features --all-targets
+
+  clippy:
+    name: Clippy
+    needs: [check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v1
+      - run: cargo clippy --all-features --all-targets
+
+  rustfmt:
+    name: Format
+    needs: [check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt
+          profile: minimal
+          override: true
+      - run: cargo fmt --all -- --check
+
+  spellcheck:
+    name: Spellcheck
+    needs: [check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: codespell-project/actions-codespell@master
+
+  deploy:
+    name: Deploy
+    needs: [clippy, rustfmt, spellcheck]
+    if: ${{ github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ secrets.TARGET }}
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v1
+      - name: Build project
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target ${{ secrets.TARGET }}
+      - name: Upload executable
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.USERNAME }}
+          source: target/${{ secrets.TARGET }}/release/banana_farm
+          target: ${{ secrets.PATH }}
+          strip_components: 3
+      - name: Restart service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.USERNAME }}
+          script: sudo systemctl restart banana_farm
