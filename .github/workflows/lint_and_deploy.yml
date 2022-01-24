@@ -1,4 +1,4 @@
-name: Lint&Deploy
+name: Lint & Deploy
 
 on: [push, pull_request]
 
@@ -90,4 +90,4 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           username: ${{ secrets.USERNAME }}
-          script: sudo systemctl restart banana_farm
+          script: sudo systemctl restart ${{ secrets.SERVICE }}

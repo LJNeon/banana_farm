@@ -4,12 +4,11 @@ use tracing::info;
 
 pub mod utility;
 
-use utility::Env;
+use utility::{Env, start_tracing};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-  tracing_subscriber::fmt::init();
-
+  let _guard = start_tracing()?;
   let _ = Env::read_vars()?;
 
   info!("Success!");
