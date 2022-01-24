@@ -33,7 +33,7 @@ jobs:
           use-cross: true
           command: build
           args: --release --target ${{ secrets.TARGET }}
-      - name: Upload project
+      - name: Upload executable
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -43,7 +43,7 @@ jobs:
           source: target/${{ secrets.TARGET }}/release/banana_farm
           target: ${{ secrets.PATH }}
           strip_components: 3
-#      - name: Deploy project
+#      - name: Restart service
 #        uses: appleboy/ssh-action@master
 #        with:
 #          host: ${{ secrets.HOST }}
